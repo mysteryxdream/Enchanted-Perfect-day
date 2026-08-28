@@ -3,6 +3,21 @@ function startGame() {
   document.getElementById("world").classList.remove("hidden");
 }
 
+function openPlace(place) {
+  document.getElementById("world").classList.add("hidden");
+  document.getElementById("place").classList.remove("hidden");
+
+  document.getElementById("placeContent").innerHTML =
+    "<h2>✨ " + place.toUpperCase() + " ✨</h2>" +
+    "<p>You entered the magical " + place + "!</p>" +
+    "<button onclick=\"backToWorld()\">← Back</button>";
+}
+
+function backToWorld() {
+  document.getElementById("place").classList.add("hidden");
+  document.getElementById("world").classList.remove("hidden");
+}
+
 let playerX = 50;
 let playerY = 50;
 
