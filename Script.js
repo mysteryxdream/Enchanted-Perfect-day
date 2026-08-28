@@ -195,3 +195,4 @@ document.addEventListener("DOMContentLoaded", () => {
     updateStats();
     updateCollection();
 });
+alert("✨My Perfect Day is working!");
