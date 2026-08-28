@@ -1,1 +1,295 @@
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:linear-gradient(135deg,#fff4fb,#f3f0ff);color:#45364d}header{padding:20px;text-align:center;background:#ffffffcc;backdrop-filter:blur(8px);position:sticky;top:0;z-index:2}h1{margin:0;font-size:clamp(28px,6vw,48px)}.wallet{margin-top:8px;font-weight:700}main{max-width:950px;margin:auto;padding:24px}.hero{text-align:center;padding:45px 20px;border-radius:28px;background:linear-gradient(135deg,#f8d9ee,#ddd8ff);box-shadow:0 10px 30px #8c719933}.hero p{font-size:22px}button{border:0;border-radius:16px;padding:13px 17px;margin:6px;background:white;color:#45364d;font-weight:700;cursor:pointer;box-shadow:0 4px 12px #00000012;transition:.2s}button:hover{transform:translateY(-2px);box-shadow:0 7px 16px #0000001a}.hero button{background:#6e568c;color:white;font-size:17px}nav{text-align:center;margin:20px 0}.panel{background:#ffffffc9;border-radius:24px;padding:24px;margin:16px 0;box-shadow:0 8px 25px #0000000d}.hidden{display:none}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.cards button{min-height:105px;font-size:17px}.cards small{display:block;font-weight:400;margin-top:8px}input{width:min(100%,650px);padding:15px;border:2px solid #eadff0;border-radius:14px;font-size:16px}.note{font-size:13px;opacity:.7}.gamebox,.artbox{margin-top:18px;padding:20px;border-radius:18px;background:#f9f4ff;text-align:center}.key{font-size:40px;cursor:pointer;margin:10px}footer{text-align:center;padding:30px;opacity:.7}#closet{font-weight:600}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #ffe8f4, #eee6ff, #e5f5ff);
+  color: #4b365f;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 18px rgba(100, 70, 120, 0.12);
+}
+
+.game-logo {
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.stats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.stats span {
+  padding: 7px 10px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(100, 70, 120, 0.1);
+}
+
+.screen {
+  width: min(1000px, 92%);
+  min-height: 70vh;
+  margin: 25px auto;
+  text-align: center;
+}
+
+.welcome-card {
+  max-width: 600px;
+  margin: 70px auto;
+  padding: 45px 25px;
+  border-radius: 35px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 15px 45px rgba(100, 70, 120, 0.15);
+}
+
+.sparkles {
+  font-size: 24px;
+}
+
+.avatar {
+  font-size: 85px;
+  margin: 15px;
+  animation: float 2.5s ease-in-out infinite;
+}
+
+.welcome-card h1 {
+  font-size: 42px;
+  margin: 10px 0;
+}
+
+.welcome-card p {
+  font-size: 18px;
+}
+
+.play-button {
+  margin-top: 20px;
+  padding: 16px 42px;
+  border-radius: 30px;
+  background: #d99acb;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  box-shadow: 0 8px 20px rgba(150, 90, 150, 0.25);
+}
+
+.play-button:hover {
+  transform: scale(1.05);
+}
+
+.academy-header {
+  margin-bottom: 25px;
+}
+
+.academy-header h1,
+.screen > h1 {
+  font-size: 34px;
+}
+
+.academy-map {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  max-width: 750px;
+  margin: auto;
+}
+
+.location {
+  min-height: 150px;
+  padding: 20px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 25px rgba(100, 70, 120, 0.13);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  transition: transform 0.2s;
+}
+
+.location:hover,
+.challenge:hover,
+.shop-grid button:hover,
+.cafe-card button:hover,
+.art-card button:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.location {
+  font-size: 48px;
+}
+
+.location strong {
+  font-size: 20px;
+}
+
+.location small,
+.challenge small,
+.shop-grid small,
+.cafe-card small {
+  font-size: 14px;
+}
+
+.back-button {
+  display: block;
+  margin: 5px 0 15px;
+  padding: 9px 15px;
+  border-radius: 20px;
+  background: white;
+  color: #654878;
+  box-shadow: 0 4px 12px rgba(100, 70, 120, 0.1);
+}
+
+.challenge-grid,
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 25px auto;
+}
+
+.challenge,
+.shop-grid button {
+  min-height: 150px;
+  padding: 20px;
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 7px 20px rgba(100, 70, 120, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 45px;
+}
+
+.challenge strong,
+.shop-grid strong {
+  font-size: 18px;
+  color: #4b365f;
+}
+
+#game {
+  margin: 25px auto;
+  max-width: 650px;
+}
+
+.mini-game {
+  padding: 25px;
+  border-radius: 28px;
+  background: white;
+  box-shadow: 0 10px 30px rgba(100, 70, 120, 0.15);
+}
+
+.mini-game button {
+  margin: 7px;
+  padding: 12px 18px;
+  border-radius: 20px;
+  background: #f3d9ee;
+}
+
+.cafe-card,
+.art-card {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 30px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px rgba(100, 70, 120, 0.13);
+}
+
+.cafe-icon {
+  font-size: 70px;
+}
+
+.cafe-card button,
+.art-card button {
+  display: block;
+  width: 90%;
+  margin: 12px auto;
+  padding: 14px;
+  border-radius: 20px;
+  background: #f2d9ec;
+}
+
+.art-card input {
+  width: 90%;
+  padding: 14px;
+  border: 2px solid #ead4e8;
+  border-radius: 18px;
+  outline: none;
+  margin-bottom: 10px;
+}
+
+#artResult {
+  margin-top: 20px;
+}
+
+#closet {
+  margin: 20px auto;
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+footer {
+  text-align: center;
+  padding: 25px;
+  font-size: 14px;
+  opacity: 0.75;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@media (max-width: 650px) {
+  .topbar {
+    flex-direction: column;
+  }
+
+  .academy-map,
+  .challenge-grid,
+  .shop-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome-card h1 {
+    font-size: 32px;
+  }
+}
