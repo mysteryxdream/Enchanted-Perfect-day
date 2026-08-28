@@ -3,7 +3,7 @@ let coins = Number(localStorage.getItem("coins")) || 100;
 let level = Number(localStorage.getItem("level")) || 1;
 let crowns = Number(localStorage.getItem("crowns")) || 0;
 
-let timeLeft = 24 * 60;
+let timeLeft = 1440;
 let timer = null;
 let dayStarted = false;
 let activities = 0;
@@ -29,7 +29,7 @@ function startGame() {
   document.getElementById("place").classList.add("hidden");
   document.getElementById("world").classList.remove("hidden");
 
-  timeLeft = 24 * 60;
+  timeLeft = 1440;
   activities = 0;
   dayStarted = true;
 
@@ -38,7 +38,7 @@ function startGame() {
 
   updatePlayer();
   updateStats();
-  updateTimerDisplay();
+  updateTimer();
 
   clearInterval(timer);
   timer = setInterval(updateTimer, 1000);
@@ -47,23 +47,18 @@ function startGame() {
 function updateTimer() {
   if (!dayStarted) return;
 
-  timeLeft--;
-
-  updateTimerDisplay();
-
-  if (timeLeft <= 0) {
-    endDay();
-  }
-}
-
-function updateTimerDisplay() {
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
+  const hours = Math.floor(timeLeft / 60);
+  const minutes = timeLeft % 60;
 
   document.getElementById("timer").textContent =
-    String(minutes).padStart(2, "0") +
-    ":" +
-    String(seconds).padStart(2, "0");
+    String(hours).padStart(2, "0") + ":" +
+    String(minutes).padStart(2, "0");
+
+  timeLeft--;
+
+  if (timeLeft < 0) {
+    endDay();
+  }
 }
 
 function endDay() {
@@ -81,24 +76,18 @@ function endDay() {
   updateStats();
 
   document.getElementById("world").classList.add("hidden");
-  document.getElementById("place").classList.add("hidden");
   document.getElementById("ending").classList.remove("hidden");
 
   document.getElementById("summary").innerHTML =
-    "You completed " +
-    activities +
+    "You completed " + activities +
     " activities today! ✨<br><br>" +
-    "🌸 Perfect Day Score: <strong>" +
-    score +
+    "🌸 Perfect Day Score: <strong>" + score +
     "%</strong><br>" +
-    "🪙 Coins: <strong>" +
-    coins +
+    "🪙 Coins: <strong>" + coins +
     "</strong><br>" +
-    "⭐ Level: <strong>" +
-    level +
+    "⭐ Level: <strong>" + level +
     "</strong><br>" +
-    "👑 Crowns: <strong>" +
-    crowns +
+    "👑 Crowns: <strong>" + crowns +
     "</strong>";
 }
 
@@ -127,7 +116,7 @@ function updatePlayer() {
   player.style.top = playerY + "%";
 }
 
-document.addEventListener("keydown", function (event) {
+document.addEventListener("keydown", function(event) {
   const key = event.key.toLowerCase();
 
   if (key === "arrowup" || key === "w") move("up");
@@ -152,19 +141,16 @@ function openPlace(place) {
 
       <div class="game-card">
         <h3>🗝️ Lost Keys</h3>
-        <p>Find the correct magical key!</p>
         <button onclick="lostKeys()">Play</button>
       </div>
 
       <div class="game-card">
         <h3>🧪 Potion Lab</h3>
-        <p>Choose the correct ingredient.</p>
         <button onclick="potionLab()">Play</button>
       </div>
 
       <div class="game-card">
         <h3>🧠 Memory Garden</h3>
-        <p>Test your magical memory!</p>
         <button onclick="memoryGarden()">Play</button>
       </div>
     `;
@@ -175,7 +161,7 @@ function openPlace(place) {
       <div class="place-icon">☕</div>
       <h2>Enchanted Café</h2>
       <p>Make a magical treat!</p>
-      <button onclick="cafeGame()">🍰 Start Café Game</button>
+      <button onclick="cafeGame()">🍰 Play</button>
       <div id="miniGame"></div>
     `;
   }
@@ -184,10 +170,10 @@ function openPlace(place) {
     content.innerHTML = `
       <div class="place-icon">🎨</div>
       <h2>Art Studio</h2>
-      <p>Describe your dream artwork.</p>
+      <p>Create your dream artwork.</p>
       <input id="artPrompt" placeholder="A pink fairy cottage...">
       <br>
-      <button onclick="createArt()">✨ Create Art</button>
+      <button onclick="createArt()">✨ Create</button>
       <div id="miniGame"></div>
     `;
   }
@@ -196,24 +182,23 @@ function openPlace(place) {
     content.innerHTML = `
       <div class="place-icon">👗</div>
       <h2>Fairy Boutique</h2>
-      <p>Spend your coins on cute items!</p>
 
       <div class="game-card">
         🎀 Pink Bow — 40 🪙
         <br>
-        <button onclick="buyItem('Pink Bow', 40)">Buy</button>
+        <button onclick="buyItem('Pink Bow',40)">Buy</button>
       </div>
 
       <div class="game-card">
         🪽 Fairy Wings — 80 🪙
         <br>
-        <button onclick="buyItem('Fairy Wings', 80)">Buy</button>
+        <button onclick="buyItem('Fairy Wings',80)">Buy</button>
       </div>
 
       <div class="game-card">
         👑 Crown — 120 🪙
         <br>
-        <button onclick="buyItem('Crown', 120)">Buy</button>
+        <button onclick="buyItem('Crown',120)">Buy</button>
       </div>
     `;
   }
@@ -222,7 +207,7 @@ function openPlace(place) {
     content.innerHTML = `
       <div class="place-icon">🛏️</div>
       <h2>My Magical Dorm</h2>
-      <p>Your cozy room at the academy. 🌸</p>
+      <p>A cozy pre-designed room for your fairy. 🌸</p>
       <button onclick="completeActivity(10)">🌙 Rest</button>
     `;
   }
@@ -231,7 +216,6 @@ function openPlace(place) {
     content.innerHTML = `
       <div class="place-icon">🌷</div>
       <h2>Enchanted Garden</h2>
-      <p>Explore the magical garden!</p>
 
       <div class="game-card">
         🌸 Collect flowers
@@ -270,7 +254,7 @@ function reward(amount) {
   saveGame();
   updateStats();
 
-  alert("✨ You earned " + amount + " coins!");
+  alert("✨ +" + amount + " coins!");
 }
 
 function completeActivity(amount) {
@@ -279,12 +263,12 @@ function completeActivity(amount) {
 
 function lostKeys() {
   const answer = prompt(
-    "🗝️ Which key is magical?\n\n1. 🔑\n2. 🗝️\n3. 🔐\n\nType 1, 2 or 3."
+    "🗝️ Which key is magical?\n\n1. 🔑\n2. 🗝️\n3. 🔐"
   );
 
   if (answer === "2") {
     reward(30);
-    alert("🎉 You found the magical key!");
+    alert("🎉 You found it!");
   } else {
     alert("Not quite! Try again. 🗝️");
   }
@@ -292,14 +276,14 @@ function lostKeys() {
 
 function potionLab() {
   const answer = prompt(
-    "🧪 Which ingredient makes the fairy potion glow?\n\n1. 🌸 Rose Petal\n2. 🪨 Stone\n3. 🍂 Leaf"
+    "🧪 Which ingredient makes the potion glow?\n\n1. 🌸 Rose Petal\n2. 🪨 Stone\n3. 🍂 Leaf"
   );
 
   if (answer === "1") {
     reward(35);
     alert("✨ Perfect potion!");
   } else {
-    alert("Oops! Try again. 🧪");
+    alert("Try again! 🧪");
   }
 }
 
@@ -307,18 +291,18 @@ function memoryGarden() {
   alert("Remember:\n\n🌸 🦋 ⭐");
 
   const answer = prompt(
-    "Type the order:\nflower, butterfly, star"
+    "Type: flower, butterfly, star"
   );
 
   if (
     answer &&
     answer.toLowerCase().replaceAll(" ", "") ===
-      "flower,butterfly,star"
+    "flower,butterfly,star"
   ) {
     reward(40);
-    alert("🧠 Amazing memory!");
+    alert("🧠 Amazing!");
   } else {
-    alert("Not quite! Try again. 🌷");
+    alert("Not quite! Try again.");
   }
 }
 
@@ -329,17 +313,19 @@ function cafeGame() {
 
   if (answer === "1") {
     reward(25);
-    alert("☕✨ Perfect Fairy Latte!");
+    alert("☕✨ Perfect!");
   } else {
-    alert("Oops! Try again.");
+    alert("Try again!");
   }
 }
 
 function createArt() {
-  const promptText = document.getElementById("artPrompt").value.trim();
+  const input = document.getElementById("artPrompt");
   const result = document.getElementById("miniGame");
 
-  if (!promptText) {
+  const text = input.value.trim();
+
+  if (!text) {
     result.innerHTML = "<p>🌸 Tell me what you want to create!</p>";
     return;
   }
@@ -347,8 +333,8 @@ function createArt() {
   result.innerHTML = `
     <div class="game-card">
       <h3>🎨 Your Artwork</h3>
-      <p>${escapeHTML(promptText)}</p>
-      <p>✨ Your magical artwork is complete!</p>
+      <p>${escapeHTML(text)}</p>
+      <p>✨ Artwork complete!</p>
     </div>
   `;
 
@@ -377,17 +363,17 @@ function buyItem(item, price) {
 function gardenActivity(type) {
   if (type === "flower") {
     reward(15);
-    alert("🌸 You collected a flower!");
+    alert("🌸 Flower collected!");
   }
 
   if (type === "butterfly") {
     reward(20);
-    alert("🦋 You found a butterfly!");
+    alert("🦋 Butterfly found!");
   }
 
   if (type === "coin") {
     reward(25);
-    alert("🪙 You found coins!");
+    alert("🪙 Coins collected!");
   }
 }
 
