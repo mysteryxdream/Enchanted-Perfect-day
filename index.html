@@ -1,246 +1,120 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Enchanted Perfect Day ✨</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Perfect Day ✨</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div id="gameScreen">
+<header>
+  <h1>🌸 My Perfect Day</h1>
+  <div class="stats">
+    🪙 <span id="coins">100</span>
+    ⭐ <span id="level">1</span>
+    👑 <span id="crowns">0</span>
+    ⏰ <span id="timer">24:00</span>
+  </div>
+</header>
 
-  <header class="topbar">
-    <div class="game-logo">🧚‍♀️ Enchanted Perfect Day</div>
+<main>
 
-    <div class="stats">
-      <span>🪙 <b id="coins">100</b></span>
-      <span>⭐ Lv.<b id="level">1</b></span>
-      <span>👑 <b id="crowns">0</b></span>
+<section id="home" class="screen">
+  <div class="welcome">
+    <div class="fairy">🧚‍♀️</div>
+    <h2>✨ Welcome to Your Perfect Day ✨</h2>
+    <p>Explore the magical academy and create your own perfect day!</p>
+    <button onclick="startGame()">🌅 Start My Day</button>
+  </div>
+</section>
+
+<section id="world" class="screen hidden">
+
+  <div class="world-title">
+    <h2>🏰 Enchanted Academy</h2>
+    <p>Where will your perfect day take you?</p>
+  </div>
+
+  <div class="map">
+
+    <button class="location academy" onclick="openPlace('academy')">
+      🏫
+      <strong>Academy</strong>
+      <small>Mini Games</small>
+    </button>
+
+    <button class="location cafe" onclick="openPlace('cafe')">
+      ☕
+      <strong>Café</strong>
+      <small>Make Treats</small>
+    </button>
+
+    <button class="location art" onclick="openPlace('art')">
+      🎨
+      <strong>Art Studio</strong>
+      <small>Create Art</small>
+    </button>
+
+    <button class="location boutique" onclick="openPlace('boutique')">
+      👗
+      <strong>Boutique</strong>
+      <small>Fashion</small>
+    </button>
+
+    <button class="location dorm" onclick="openPlace('dorm')">
+      🛏️
+      <strong>Dorm</strong>
+      <small>Rest</small>
+    </button>
+
+    <button class="location garden" onclick="openPlace('garden')">
+      🌷
+      <strong>Enchanted Garden</strong>
+      <small>Explore</small>
+    </button>
+
+    <div id="player">🧚‍♀️</div>
+
+  </div>
+
+  <div class="controls">
+    <button ontouchstart="move('up')" onclick="move('up')">⬆️</button>
+    <div>
+      <button ontouchstart="move('left')" onclick="move('left')">⬅️</button>
+      <button ontouchstart="move('down')" onclick="move('down')">⬇️</button>
+      <button ontouchstart="move('right')" onclick="move('right')">➡️</button>
     </div>
-  </header>
+  </div>
 
+  <p class="hint">📱 Use the buttons or 💻 arrow keys to move!</p>
 
-  <section id="home" class="screen">
+</section>
 
-    <div class="welcome-card">
+<section id="place" class="screen hidden">
+  <button class="back" onclick="backToWorld()">← Back to Academy</button>
+  <div id="placeContent"></div>
+</section>
 
-      <div class="sparkles">✨ ✨ ✨</div>
+<section id="ending" class="screen hidden">
+  <div class="welcome">
+    <div class="fairy">🌙🧚‍♀️</div>
+    <h2>🌙 Your Perfect Day</h2>
+    <p id="summary"></p>
+    <button onclick="startGame()">🌅 Start Another Day</button>
+  </div>
+</section>
 
-      <div class="avatar">🧚‍♀️</div>
+</main>
 
-      <h1>Enchanted Academy</h1>
+<footer>
+  ✨ Create your world. Play your way. Make it your perfect day. ✨
+</footer>
 
-      <p>Your magical day starts here...</p>
-
-      <button class="play-button" onclick="enterAcademy()">
-        ✨ PLAY ✨
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <section id="academy" class="screen hidden">
-
-    <div class="academy-header">
-      <h1>🏰 Enchanted Academy</h1>
-      <p>Where will your perfect day take you?</p>
-    </div>
-
-    <div class="academy-map">
-
-      <button class="location academy" onclick="openLocation('activities')">
-        🏫
-        <strong>Academy</strong>
-        <small>Magical Challenges</small>
-      </button>
-
-      <button class="location cafe" onclick="openLocation('cafe')">
-        ☕
-        <strong>Café</strong>
-        <small>Make Treats</small>
-      </button>
-
-      <button class="location art" onclick="openLocation('art')">
-        🎨
-        <strong>Art Studio</strong>
-        <small>Create Art</small>
-      </button>
-
-      <button class="location boutique" onclick="openLocation('customize')">
-        👗
-        <strong>Boutique</strong>
-        <small>Fashion</small>
-      </button>
-
-      <button class="location dorm" onclick="openLocation('dorm')">
-        🛏️
-        <strong>Dorm</strong>
-        <small>Your Room</small>
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <section id="activities" class="screen hidden">
-
-    <button class="back-button" onclick="backToAcademy()">← Academy</button>
-
-    <h1>🎮 Magical Challenges</h1>
-
-    <div class="challenge-grid">
-
-      <button class="challenge" onclick="play('keys')">
-        🗝️
-        <strong>Lost Keys</strong>
-        <small>Find the academy key!</small>
-      </button>
-
-      <button class="challenge" onclick="play('potion')">
-        🧪
-        <strong>Potion Lab</strong>
-        <small>Choose the right ingredient!</small>
-      </button>
-
-      <button class="challenge" onclick="play('memory')">
-        🧠
-        <strong>Memory Garden</strong>
-        <small>Remember the magic!</small>
-      </button>
-
-    </div>
-
-    <div id="game"></div>
-
-  </section>
-
-
-  <section id="cafe" class="screen hidden">
-
-    <button class="back-button" onclick="backToAcademy()">← Academy</button>
-
-    <h1>☕ Enchanted Café</h1>
-
-    <div class="cafe-card">
-
-      <div class="cafe-icon">🧁</div>
-
-      <h2>Welcome, little chef!</h2>
-
-      <p>Make magical treats and earn coins.</p>
-
-      <button onclick="earn(25,'You served a magical cupcake! 🧁')">
-        🧁 Serve Cupcake
-        <small>+25 🪙</small>
-      </button>
-
-      <button onclick="earn(35,'You made a fairy latte! ☕✨')">
-        ☕ Make Fairy Latte
-        <small>+35 🪙</small>
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <section id="art" class="screen hidden">
-
-    <button class="back-button" onclick="backToAcademy()">← Academy</button>
-
-    <h1>🎨 Art Studio</h1>
-
-    <div class="art-card">
-
-      <p>Describe your dream artwork:</p>
-
-      <input id="prompt" placeholder="A pink fairy cottage under the moon...">
-
-      <button onclick="generateArt()">✨ Create</button>
-
-      <div id="artResult"></div>
-
-    </div>
-
-  </section>
-
-
-  <section id="customize" class="screen hidden">
-
-    <button class="back-button" onclick="backToAcademy()">← Academy</button>
-
-    <h1>👗 Magical Boutique</h1>
-
-    <div class="shop-grid">
-
-      <button onclick="buy('🎀 Pink Bow',40)">
-        🎀
-        <strong>Pink Bow</strong>
-        <small>40 🪙</small>
-      </button>
-
-      <button onclick="buy('🪽 Fairy Wings',80)">
-        🪽
-        <strong>Fairy Wings</strong>
-        <small>80 🪙</small>
-      </button>
-
-      <button onclick="buy('👑 Crown',120)">
-        👑
-        <strong>Royal Crown</strong>
-        <small>120 🪙</small>
-      </button>
-
-    </div>
-
-    <p id="closet">Your collection is empty.</p>
-
-  </section>
-
-
-  <section id="dorm" class="screen hidden">
-
-    <button class="back-button" onclick="backToAcademy()">← Academy</button>
-
-    <h1>🛏️ My Magical Dorm</h1>
-
-    <div class="shop-grid">
-
-      <button onclick="buy('🌷 Flower Plant',30)">
-        🌷
-        <strong>Flower Plant</strong>
-        <small>30 🪙</small>
-      </button>
-
-      <button onclick="buy('🧸 Cozy Rug',50)">
-        🧸
-        <strong>Cozy Rug</strong>
-        <small>50 🪙</small>
-      </button>
-
-      <button onclick="buy('✨ Star Lights',70)">
-        ✨
-        <strong>Star Lights</strong>
-        <small>70 🪙</small>
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <footer>
-    ✨ Create your world. Play your way. Make it your perfect day. ✨
-  </footer>
-
-</div>
-
-<script defer src="./script.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
+```
