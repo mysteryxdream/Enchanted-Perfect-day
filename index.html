@@ -1,423 +1,120 @@
-```javascript
-let coins = Number(localStorage.getItem("coins")) || 100;
-let level = Number(localStorage.getItem("level")) || 1;
-let crowns = Number(localStorage.getItem("crowns")) || 0;
-
-let timeLeft = 1440;
-let timer = null;
-let dayStarted = false;
-let activities = 0;
-
-let playerX = 50;
-let playerY = 50;
-
-function updateStats() {
-  const coinsEl = document.getElementById("coins");
-  const levelEl = document.getElementById("level");
-  const crownsEl = document.getElementById("crowns");
-
-  if (coinsEl) coinsEl.textContent = coins;
-  if (levelEl) levelEl.textContent = level;
-  if (crownsEl) crownsEl.textContent = crowns;
-}
-
-function saveGame() {
-  localStorage.setItem("coins", coins);
-  localStorage.setItem("level", level);
-  localStorage.setItem("crowns", crowns);
-}
-
-function startGame() {
-  const home = document.getElementById("home");
-  const world = document.getElementById("world");
-  const place = document.getElementById("place");
-  const ending = document.getElementById("ending");
-
-  if (!home || !world) return;
-
-  home.classList.add("hidden");
-
-  if (place) place.classList.add("hidden");
-  if (ending) ending.classList.add("hidden");
-
-  world.classList.remove("hidden");
-
-  timeLeft = 1440;
-  activities = 0;
-  dayStarted = true;
-
-  playerX = 50;
-  playerY = 50;
-
-  updatePlayer();
-  updateStats();
-  updateTimerDisplay();
-
-  clearInterval(timer);
-  timer = setInterval(updateTimer, 1000);
-}
-
-function updateTimer() {
-  if (!dayStarted) return;
-
-  timeLeft--;
-
-  updateTimerDisplay();
-
-  if (timeLeft <= 0) {
-    endDay();
-  }
-}
-
-function updateTimerDisplay() {
-  const timerEl = document.getElementById("timer");
-
-  if (!timerEl) return;
-
-  const hours = Math.floor(timeLeft / 60);
-  const minutes = timeLeft % 60;
-
-  timerEl.textContent =
-    String(hours).padStart(2, "0") +
-    ":" +
-    String(minutes).padStart(2, "0");
-}
-
-function endDay() {
-  clearInterval(timer);
-  timer = null;
-  dayStarted = false;
-
-  const score = Math.min(100, 40 + activities * 10);
-
-  if (score >= 80) {
-    crowns++;
-  }
-
-  saveGame();
-  updateStats();
-
-  document.getElementById("world").classList.add("hidden");
-  document.getElementById("ending").classList.remove("hidden");
-
-  document.getElementById("summary").innerHTML =
-    "You completed " + activities +
-    " activities today! ✨<br><br>" +
-    "🌸 Perfect Day Score: <strong>" + score +
-    "%</strong><br>" +
-    "🪙 Coins: <strong>" + coins +
-    "</strong><br>" +
-    "⭐ Level: <strong>" + level +
-    "</strong><br>" +
-    "👑 Crowns: <strong>" + crowns +
-    "</strong>";
-}
-
-function move(direction) {
-  if (!dayStarted) return;
-
-  const step = 4;
-
-  if (direction === "up") playerY -= step;
-  if (direction === "down") playerY += step;
-  if (direction === "left") playerX -= step;
-  if (direction === "right") playerX += step;
-
-  playerX = Math.max(5, Math.min(95, playerX));
-  playerY = Math.max(8, Math.min(92, playerY));
-
-  updatePlayer();
-}
-
-function updatePlayer() {
-  const player = document.getElementById("player");
-
-  if (!player) return;
-
-  player.style.left = playerX + "%";
-  player.style.top = playerY + "%";
-}
-
-document.addEventListener("keydown", function(event) {
-  if (
-    event.key === "ArrowUp" ||
-    event.key === "ArrowDown" ||
-    event.key === "ArrowLeft" ||
-    event.key === "ArrowRight"
-  ) {
-    event.preventDefault();
-  }
-
-  if (event.key === "ArrowUp") move("up");
-  if (event.key === "ArrowDown") move("down");
-  if (event.key === "ArrowLeft") move("left");
-  if (event.key === "ArrowRight") move("right");
-});
-
-function openPlace(place) {
-  if (!dayStarted) return;
-
-  document.getElementById("world").classList.add("hidden");
-  document.getElementById("place").classList.remove("hidden");
-
-  const content = document.getElementById("placeContent");
-
-  if (place === "academy") {
-    content.innerHTML = `
-      <div class="place-icon">🏫</div>
-      <h2>Enchanted Academy</h2>
-      <p>Choose your magical challenge!</p>
-
-      <div class="game-card">
-        <h3>🗝️ Lost Keys</h3>
-        <p>Find the magical key!</p>
-        <button onclick="lostKeys()">Play</button>
-      </div>
-
-      <div class="game-card">
-        <h3>🧪 Potion Lab</h3>
-        <p>Make the correct potion!</p>
-        <button onclick="potionLab()">Play</button>
-      </div>
-
-      <div class="game-card">
-        <h3>🌷 Memory Garden</h3>
-        <p>Test your magical memory!</p>
-        <button onclick="memoryGarden()">Play</button>
-      </div>
-    `;
-  }
-
-  if (place === "cafe") {
-    content.innerHTML = `
-      <div class="place-icon">☕</div>
-      <h2>Enchanted Café</h2>
-      <p>Make a magical treat!</p>
-      <button onclick="cafeGame()">🍰 Play Café Game</button>
-      <div id="miniGame"></div>
-    `;
-  }
-
-  if (place === "art") {
-    content.innerHTML = `
-      <div class="place-icon">🎨</div>
-      <h2>Art Studio</h2>
-      <p>Create something for your Perfect Day!</p>
-
-      <input id="artPrompt" placeholder="A pink fairy cottage...">
-      <br>
-
-      <button onclick="createArt()">✨ Create Art</button>
-
-      <div id="miniGame"></div>
-    `;
-  }
-
-  if (place === "boutique") {
-    content.innerHTML = `
-      <div class="place-icon">👗</div>
-      <h2>Fairy Boutique</h2>
-
-      <div class="game-card">
-        🎀 Pink Bow — 40 🪙
-        <br>
-        <button onclick="buyItem('Pink Bow',40)">Buy</button>
-      </div>
-
-      <div class="game-card">
-        🪽 Fairy Wings — 80 🪙
-        <br>
-        <button onclick="buyItem('Fairy Wings',80)">Buy</button>
-      </div>
-
-      <div class="game-card">
-        👑 Crown — 120 🪙
-        <br>
-        <button onclick="buyItem('Crown',120)">Buy</button>
-      </div>
-    `;
-  }
-
-  if (place === "dorm") {
-    content.innerHTML = `
-      <div class="place-icon">🛏️</div>
-      <h2>My Magical Dorm</h2>
-      <p>Your cozy pre-designed dorm. 🌸</p>
-      <button onclick="completeActivity(10)">🌙 Rest</button>
-    `;
-  }
-
-  if (place === "garden") {
-    content.innerHTML = `
-      <div class="place-icon">🌷</div>
-      <h2>Memory Garden</h2>
-      <p>A peaceful place for magical memories. ✨</p>
-
-      <div class="game-card">
-        🌸 Collect flowers
-        <br>
-        <button onclick="gardenActivity('flower')">Collect</button>
-      </div>
-
-      <div class="game-card">
-        🦋 Find butterflies
-        <br>
-        <button onclick="gardenActivity('butterfly')">Find</button>
-      </div>
-
-      <div class="game-card">
-        🪙 Find a lucky coin
-        <br>
-        <button onclick="gardenActivity('coin')">Find</button>
-      </div>
-    `;
-  }
-}
-
-function backToWorld() {
-  document.getElementById("place").classList.add("hidden");
-  document.getElementById("world").classList.remove("hidden");
-}
-
-function reward(amount) {
-  coins += amount;
-  activities++;
-
-  if (activities % 3 === 0) {
-    level++;
-  }
-
-  saveGame();
-  updateStats();
-
-  alert("✨ +" + amount + " coins!");
-}
-
-function completeActivity(amount) {
-  reward(amount);
-}
-
-function lostKeys() {
-  const answer = prompt(
-    "🗝️ Which key is magical?\n\n1. 🔑\n2. 🗝️\n3. 🔐"
-  );
-
-  if (answer === "2") {
-    reward(30);
-    alert("🎉 You found the magical key!");
-  } else {
-    alert("Not quite! Try again. 🗝️");
-  }
-}
-
-function potionLab() {
-  const answer = prompt(
-    "🧪 Which ingredient makes the potion glow?\n\n1. 🌸 Rose Petal\n2. 🪨 Stone\n3. 🍂 Leaf"
-  );
-
-  if (answer === "1") {
-    reward(35);
-    alert("✨ Perfect potion!");
-  } else {
-    alert("Try again! 🧪");
-  }
-}
-
-function memoryGarden() {
-  alert("Remember:\n\n🌸 🦋 ⭐");
-
-  const answer = prompt(
-    "Type: flower, butterfly, star"
-  );
-
-  if (
-    answer &&
-    answer.toLowerCase().replace(/\s/g, "") ===
-    "flower,butterfly,star"
-  ) {
-    reward(40);
-    alert("🧠 Amazing memory!");
-  } else {
-    alert("Not quite! Try again.");
-  }
-}
-
-function cafeGame() {
-  const answer = prompt(
-    "☕ Make a Fairy Latte!\n\n1. Milk → Stardust → Rose Syrup\n2. Stone → Milk → Leaf\n3. Leaf → Stone → Stardust"
-  );
-
-  if (answer === "1") {
-    reward(25);
-    alert("☕✨ Perfect!");
-  } else {
-    alert("Try again!");
-  }
-}
-
-function createArt() {
-  const input = document.getElementById("artPrompt");
-  const result = document.getElementById("miniGame");
-
-  const text = input.value.trim();
-
-  if (!text) {
-    result.innerHTML =
-      "<p>🌸 Tell me what you want to create!</p>";
-    return;
-  }
-
-  result.innerHTML = `
-    <div class="game-card">
-      <h3>🎨 Your Artwork</h3>
-      <p>${escapeHTML(text)}</p>
-      <p>✨ Artwork complete!</p>
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Perfect Day ✨</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <h1>🌸 My Perfect Day</h1>
+  <div class="stats">
+    🪙 <span id="coins">100</span>
+    ⭐ <span id="level">1</span>
+    👑 <span id="crowns">0</span>
+    ⏰ <span id="timer">24:00</span>
+  </div>
+</header>
+
+<main>
+
+<section id="home" class="screen">
+  <div class="welcome">
+    <div class="fairy">🧚‍♀️</div>
+    <h2>✨ Welcome to Your Perfect Day ✨</h2>
+    <p>Explore the magical academy and create your own perfect day!</p>
+    <button onclick="startGame()">🌅 Start My Day</button>
+  </div>
+</section>
+
+<section id="world" class="screen hidden">
+
+  <div class="world-title">
+    <h2>🏰 Enchanted Academy</h2>
+    <p>Where will your perfect day take you?</p>
+  </div>
+
+  <div class="map">
+
+    <button class="location academy" onclick="openPlace('academy')">
+      🏫
+      <strong>Academy</strong>
+      <small>Mini Games</small>
+    </button>
+
+    <button class="location cafe" onclick="openPlace('cafe')">
+      ☕
+      <strong>Café</strong>
+      <small>Make Treats</small>
+    </button>
+
+    <button class="location art" onclick="openPlace('art')">
+      🎨
+      <strong>Art Studio</strong>
+      <small>Create Art</small>
+    </button>
+
+    <button class="location boutique" onclick="openPlace('boutique')">
+      👗
+      <strong>Boutique</strong>
+      <small>Fashion</small>
+    </button>
+
+    <button class="location dorm" onclick="openPlace('dorm')">
+      🛏️
+      <strong>Dorm</strong>
+      <small>Rest</small>
+    </button>
+
+    <button class="location garden" onclick="openPlace('garden')">
+      🌷
+      <strong>Enchanted Garden</strong>
+      <small>Explore</small>
+    </button>
+
+    <div id="player">🧚‍♀️</div>
+
+  </div>
+
+  <div class="controls">
+    <button ontouchstart="move('up')" onclick="move('up')">⬆️</button>
+    <div>
+      <button ontouchstart="move('left')" onclick="move('left')">⬅️</button>
+      <button ontouchstart="move('down')" onclick="move('down')">⬇️</button>
+      <button ontouchstart="move('right')" onclick="move('right')">➡️</button>
     </div>
-  `;
+  </div>
 
-  reward(20);
-}
+  <p class="hint">📱 Use the buttons or 💻 arrow keys to move!</p>
 
-function escapeHTML(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
+</section>
 
-function buyItem(item, price) {
-  if (coins < price) {
-    alert("You need more coins! 🪙");
-    return;
-  }
+<section id="place" class="screen hidden">
+  <button class="back" onclick="backToWorld()">← Back to Academy</button>
+  <div id="placeContent"></div>
+</section>
 
-  coins -= price;
+<section id="ending" class="screen hidden">
+  <div class="welcome">
+    <div class="fairy">🌙🧚‍♀️</div>
+    <h2>🌙 Your Perfect Day</h2>
+    <p id="summary"></p>
+    <button onclick="startGame()">🌅 Start Another Day</button>
+  </div>
+</section>
 
-  if (item === "Crown") {
-    crowns++;
-  }
+</main>
 
-  saveGame();
-  updateStats();
+<footer>
+  ✨ Create your world. Play your way. Make it your perfect day. ✨
+</footer>
 
-  alert("🎀 You bought " + item + "!");
-}
+<script src="script.js"></script>
 
-function gardenActivity(type) {
-  if (type === "flower") {
-    reward(15);
-    alert("🌸 Flower collected!");
-  }
-
-  if (type === "butterfly") {
-    reward(20);
-    alert("🦋 Butterfly found!");
-  }
-
-  if (type === "coin") {
-    reward(25);
-    alert("🪙 Lucky coin found!");
-  }
-}
-
-updateStats();
+</body>
+</html>
 ```
