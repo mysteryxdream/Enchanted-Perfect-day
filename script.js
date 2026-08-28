@@ -1,27 +1,165 @@
 ```javascript
+let coins = 100;
+let level = 1;
+let crowns = 0;
+
+let dayStarted = false;
+let activities = 0;
+
 let playerX = 50;
 let playerY = 50;
 
+let timeLeft = 1440;
+let timer = null;
+
+
+/* =========================
+   START THE PERFECT DAY
+========================= */
+
 function startGame() {
-  document.getElementById("home").classList.add("hidden");
-  document.getElementById("world").classList.remove("hidden");
+  const home = document.getElementById("home");
+  const world = document.getElementById("world");
+
+  if (!home || !world) {
+    alert("Game screen could not load.");
+    return;
+  }
+
+  home.classList.add("hidden");
+  world.classList.remove("hidden");
+
+  dayStarted = true;
+  activities = 0;
 
   playerX = 50;
   playerY = 50;
+
   updatePlayer();
+  updateStats();
+  updateTimer();
+
+  clearInterval(timer);
+
+  timer = setInterval(function () {
+    if (!dayStarted) return;
+
+    timeLeft--;
+
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      endDay();
+    }
+
+    updateTimer();
+  }, 1000);
 }
 
-function move(direction) {
-  const player = document.getElementById("player");
 
-  if (!player) return;
+/* =========================
+   STATS
+========================= */
+
+function updateStats() {
+  const coinsEl = document.getElementById("coins");
+  const levelEl = document.getElementById("level");
+  const crownsEl = document.getElementById("crowns");
+
+  if (coinsEl) coinsEl.textContent = coins;
+  if (levelEl) levelEl.textContent = level;
+  if (crownsEl) crownsEl.textContent = crowns;
+}
+
+
+/* =========================
+   TIMER
+========================= */
+
+function updateTimer() {
+  const timerEl = document.getElementById("timer");
+
+  if (!timerEl) return;
+
+  const hours = Math.floor(timeLeft / 60);
+  const minutes = timeLeft % 60;
+
+  timerEl.textContent =
+    String(hours).padStart(2, "0") +
+    ":" +
+    String(minutes).padStart(2, "0");
+}
+
+
+/* =========================
+   END OF DAY
+========================= */
+
+function endDay() {
+  clearInterval(timer);
+  timer = null;
+
+  dayStarted = false;
+
+  const score = Math.min(100, 40 + activities * 10);
+
+  if (score >= 80) {
+    crowns++;
+  }
+
+  const world = document.getElementById("world");
+  const ending = document.getElementById("ending");
+  const summary = document.getElementById("summary");
+
+  if (world) world.classList.add("hidden");
+  if (ending) ending.classList.remove("hidden");
+
+  if (summary) {
+    summary.innerHTML =
+      "You completed " +
+      activities +
+      " activities today! ✨<br><br>" +
+      "🌸 Perfect Day Score: <strong>" +
+      score +
+      "%</strong><br>" +
+      "🪙 Coins: <strong>" +
+      coins +
+      "</strong><br>" +
+      "⭐ Level: <strong>" +
+      level +
+      "</strong><br>" +
+      "👑 Crowns: <strong>" +
+      crowns +
+      "</strong>";
+  }
+
+  updateStats();
+}
+
+
+/* =========================
+   FAIRY MOVEMENT
+========================= */
+
+function move(direction) {
+  if (!dayStarted) return;
 
   const step = 4;
 
-  if (direction === "up") playerY -= step;
-  if (direction === "down") playerY += step;
-  if (direction === "left") playerX -= step;
-  if (direction === "right") playerX += step;
+  if (direction === "up") {
+    playerY -= step;
+  }
+
+  if (direction === "down") {
+    playerY += step;
+  }
+
+  if (direction === "left") {
+    playerX -= step;
+  }
+
+  if (direction === "right") {
+    playerX += step;
+  }
 
   playerX = Math.max(5, Math.min(95, playerX));
   playerY = Math.max(8, Math.min(92, playerY));
@@ -29,6 +167,7 @@ function move(direction) {
   updatePlayer();
   checkLocation();
 }
+
 
 function updatePlayer() {
   const player = document.getElementById("player");
@@ -39,205 +178,406 @@ function updatePlayer() {
   player.style.top = playerY + "%";
 }
 
-document.addEventListener("keydown", function(event) {
-  if (event.key === "ArrowUp") move("up");
-  if (event.key === "ArrowDown") move("down");
-  if (event.key === "ArrowLeft") move("left");
-  if (event.key === "ArrowRight") move("right");
+
+/* =========================
+   KEYBOARD CONTROLS
+========================= */
+
+document.addEventListener("keydown", function (event) {
+
+  if (event.key === "ArrowUp") {
+    event.preventDefault();
+    move("up");
+  }
+
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    move("down");
+  }
+
+  if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    move("left");
+  }
+
+  if (event.key === "ArrowRight") {
+    event.preventDefault();
+    move("right");
+  }
+
 });
 
+
+/* =========================
+   LOCATION DETECTION
+========================= */
+
+let lastLocation = null;
+
 function checkLocation() {
+
   let location = null;
 
-  // Academy
-  if (playerX < 30 && playerY < 40) {
+  /*
+     These areas match the six locations
+     on your map.
+  */
+
+  if (playerX <= 30 && playerY <= 38) {
     location = "academy";
   }
 
-  // Cafe
-  else if (playerX > 70 && playerY < 40) {
+  else if (playerX >= 70 && playerY <= 38) {
     location = "cafe";
   }
 
-  // Art Studio
-  else if (playerX < 30 && playerY >= 40 && playerY < 70) {
+  else if (
+    playerX <= 30 &&
+    playerY > 38 &&
+    playerY < 70
+  ) {
     location = "art";
   }
 
-  // Boutique
-  else if (playerX > 70 && playerY >= 40 && playerY < 70) {
+  else if (
+    playerX >= 70 &&
+    playerY > 38 &&
+    playerY < 70
+  ) {
     location = "boutique";
   }
 
-  // Dorm
-  else if (playerX < 30 && playerY >= 70) {
+  else if (
+    playerX <= 30 &&
+    playerY >= 70
+  ) {
     location = "dorm";
   }
 
-  // Garden
-  else if (playerX > 70 && playerY >= 70) {
+  else if (
+    playerX >= 70 &&
+    playerY >= 70
+  ) {
     location = "garden";
   }
 
-  if (location) {
+
+  if (location && location !== lastLocation) {
+
+    lastLocation = location;
+
     openPlace(location);
+
+  }
+
+  if (!location) {
+    lastLocation = null;
   }
 }
 
-function openPlace(place) {
-  document.getElementById("world").classList.add("hidden");
-  document.getElementById("place").classList.remove("hidden");
 
+/* =========================
+   OPEN LOCATIONS
+========================= */
+
+function openPlace(place) {
+
+  if (!dayStarted) return;
+
+  const world = document.getElementById("world");
+  const placeScreen = document.getElementById("place");
   const content = document.getElementById("placeContent");
 
+  if (!world || !placeScreen || !content) {
+    alert("Location screen is missing.");
+    return;
+  }
+
+  world.classList.add("hidden");
+  placeScreen.classList.remove("hidden");
+
+
+  /* ACADEMY */
+
   if (place === "academy") {
+
     content.innerHTML = `
       <div class="place-icon">🏫</div>
+
       <h2>Enchanted Academy</h2>
-      <p>Choose a magical challenge! ✨</p>
+
+      <p>Choose a magical mini-game! ✨</p>
 
       <div class="game-card">
         <h3>🗝️ Lost Keys</h3>
-        <p>Find the magical key!</p>
+        <p>Find the magical key.</p>
         <button onclick="lostKeys()">Play</button>
       </div>
 
       <div class="game-card">
         <h3>🧪 Potion Lab</h3>
-        <p>Make the perfect potion!</p>
+        <p>Create the perfect potion.</p>
         <button onclick="potionLab()">Play</button>
       </div>
 
       <div class="game-card">
-        <h3>🧠 Memory Garden</h3>
-        <p>Test your memory!</p>
+        <h3>🌷 Memory Garden</h3>
+        <p>Test your memory.</p>
         <button onclick="memoryGarden()">Play</button>
       </div>
     `;
+
   }
+
+
+  /* CAFE */
 
   if (place === "cafe") {
+
     content.innerHTML = `
       <div class="place-icon">☕</div>
+
       <h2>Enchanted Café</h2>
+
       <p>Make a magical treat! 🍰</p>
-      <button onclick="cafeGame()">🍰 Make a Treat</button>
+
+      <button onclick="cafeGame()">
+        🍰 Make a Treat
+      </button>
+
       <div id="miniGame"></div>
     `;
+
   }
+
+
+  /* ART */
 
   if (place === "art") {
+
     content.innerHTML = `
       <div class="place-icon">🎨</div>
-      <h2>Art Studio</h2>
-      <p>Create something magical! ✨</p>
 
-      <input id="artPrompt" placeholder="A pink fairy cottage...">
+      <h2>Art Studio</h2>
+
+      <p>Create something for your Perfect Day! ✨</p>
+
+      <input
+        id="artPrompt"
+        placeholder="A pink fairy cottage..."
+      >
+
       <br>
 
-      <button onclick="createArt()">🎨 Create</button>
+      <button onclick="createArt()">
+        ✨ Create Art
+      </button>
 
       <div id="miniGame"></div>
     `;
+
   }
 
+
+  /* BOUTIQUE */
+
   if (place === "boutique") {
+
     content.innerHTML = `
       <div class="place-icon">👗</div>
+
       <h2>Fairy Boutique</h2>
+
       <p>Choose something cute! 🎀</p>
 
       <div class="game-card">
-        🎀 Pink Bow
+        🎀 Pink Bow — 40 🪙
         <br>
-        <button onclick="chooseItem('Pink Bow')">Choose</button>
+        <button onclick="buyItem('Pink Bow', 40)">
+          Buy
+        </button>
       </div>
 
       <div class="game-card">
-        🪽 Fairy Wings
+        🪽 Fairy Wings — 80 🪙
         <br>
-        <button onclick="chooseItem('Fairy Wings')">Choose</button>
+        <button onclick="buyItem('Fairy Wings', 80)">
+          Buy
+        </button>
       </div>
 
       <div class="game-card">
-        👑 Tiny Crown
+        👑 Crown — 120 🪙
         <br>
-        <button onclick="chooseItem('Tiny Crown')">Choose</button>
+        <button onclick="buyItem('Crown', 120)">
+          Buy
+        </button>
       </div>
     `;
+
   }
+
+
+  /* DORM */
 
   if (place === "dorm") {
+
     content.innerHTML = `
       <div class="place-icon">🛏️</div>
+
       <h2>My Magical Dorm</h2>
+
       <p>Your cozy pre-decorated dorm. 🌸</p>
 
-      <button onclick="rest()">🌙 Rest</button>
+      <button onclick="rest()">
+        🌙 Rest
+      </button>
     `;
+
   }
 
+
+  /* GARDEN */
+
   if (place === "garden") {
+
     content.innerHTML = `
       <div class="place-icon">🌷</div>
+
       <h2>Enchanted Garden</h2>
-      <p>A peaceful magical garden. 🦋</p>
+
+      <p>Spend some peaceful time in the garden. 🦋</p>
 
       <div class="game-card">
         🌸 Collect Flowers
         <br>
-        <button onclick="gardenGame('flower')">Collect</button>
+        <button onclick="gardenGame('flower')">
+          Collect
+        </button>
       </div>
 
       <div class="game-card">
         🦋 Find Butterflies
         <br>
-        <button onclick="gardenGame('butterfly')">Find</button>
+        <button onclick="gardenGame('butterfly')">
+          Find
+        </button>
       </div>
 
       <div class="game-card">
-        ✨ Find Something Magical
+        ✨ Explore
         <br>
-        <button onclick="gardenGame('magic')">Explore</button>
+        <button onclick="gardenGame('magic')">
+          Explore
+        </button>
       </div>
     `;
+
   }
 }
 
+
+/* =========================
+   BACK BUTTON
+========================= */
+
 function backToWorld() {
+
   document.getElementById("place").classList.add("hidden");
+
   document.getElementById("world").classList.remove("hidden");
+
+  lastLocation = null;
 }
 
+
+/* =========================
+   REWARDS
+========================= */
+
+function reward(amount) {
+
+  coins += amount;
+
+  activities++;
+
+  if (activities % 3 === 0) {
+    level++;
+  }
+
+  updateStats();
+
+  alert("✨ +" + amount + " coins!");
+
+}
+
+
+/* =========================
+   LOST KEYS
+========================= */
+
 function lostKeys() {
+
   const answer = prompt(
-    "🗝️ Which key is magical?\n\n1. 🔑\n2. 🗝️\n3. 🔐"
+    "🗝️ Which key is magical?\n\n" +
+    "1. 🔑\n" +
+    "2. 🗝️\n" +
+    "3. 🔐"
   );
 
   if (answer === "2") {
+
+    reward(30);
+
     alert("🎉 You found the magical key!");
+
   } else {
-    alert("Not quite! Try again 🗝️");
+
+    alert("Not quite! Try again. 🗝️");
+
   }
+
 }
 
+
+/* =========================
+   POTION LAB
+========================= */
+
 function potionLab() {
+
   const answer = prompt(
-    "🧪 Which ingredient makes the potion sparkle?\n\n1. 🌸 Rose Petal\n2. 🪨 Stone\n3. 🍂 Leaf"
+    "🧪 Which ingredient makes the potion glow?\n\n" +
+    "1. 🌸 Rose Petal\n" +
+    "2. 🪨 Stone\n" +
+    "3. 🍂 Leaf"
   );
 
   if (answer === "1") {
+
+    reward(35);
+
     alert("✨ Perfect potion!");
+
   } else {
+
     alert("Try again! 🧪");
+
   }
+
 }
 
+
+/* =========================
+   MEMORY GARDEN
+========================= */
+
 function memoryGarden() {
+
   alert("Remember:\n\n🌸 🦋 ⭐");
 
   const answer = prompt(
-    "Type: flower, butterfly, star"
+    "Type:\nflower, butterfly, star"
   );
 
   if (
@@ -245,61 +585,171 @@ function memoryGarden() {
     answer.toLowerCase().replace(/\s/g, "") ===
     "flower,butterfly,star"
   ) {
+
+    reward(40);
+
     alert("🧠 Amazing memory!");
+
   } else {
-    alert("Not quite! Try again 🌷");
+
+    alert("Not quite! Try again.");
+
   }
+
 }
 
+
+/* =========================
+   CAFE
+========================= */
+
 function cafeGame() {
+
   const answer = prompt(
-    "☕ Which treat should you make?\n\n1. 🧁 Fairy Cupcake\n2. 🍎 Apple\n3. 🥪 Sandwich"
+    "☕ Make a Fairy Latte!\n\n" +
+    "1. Milk → Stardust → Rose Syrup\n" +
+    "2. Stone → Milk → Leaf\n" +
+    "3. Leaf → Stone → Stardust"
   );
 
   if (answer === "1") {
-    alert("🧁✨ Perfect fairy cupcake!");
+
+    reward(25);
+
+    alert("☕✨ Perfect!");
+
   } else {
-    alert("Try the fairy cupcake! 🎀");
+
+    alert("Try again!");
+
   }
+
 }
 
+
+/* =========================
+   ART STUDIO
+========================= */
+
 function createArt() {
+
   const input = document.getElementById("artPrompt");
+
   const result = document.getElementById("miniGame");
 
-  if (!input.value.trim()) {
-    result.innerHTML = "<p>🌸 Tell me what you want to create!</p>";
+  if (!input || !result) return;
+
+  const text = input.value.trim();
+
+  if (!text) {
+
+    result.innerHTML =
+      "<p>🌸 Tell me what you want to create!</p>";
+
     return;
   }
 
   result.innerHTML = `
     <div class="game-card">
       <h3>🎨 Artwork Complete!</h3>
-      <p>${input.value}</p>
-      <p>✨ Your art is part of your Perfect Day!</p>
+      <p>${escapeHTML(text)}</p>
+      <p>✨ Beautiful!</p>
     </div>
   `;
+
+  reward(20);
+
 }
 
-function chooseItem(item) {
-  alert("🎀 You chose the " + item + "!");
+
+/* =========================
+   SAFE ART TEXT
+========================= */
+
+function escapeHTML(text) {
+
+  const div = document.createElement("div");
+
+  div.textContent = text;
+
+  return div.innerHTML;
+
 }
+
+
+/* =========================
+   BOUTIQUE
+========================= */
+
+function buyItem(item, price) {
+
+  if (coins < price) {
+
+    alert("You need more coins! 🪙");
+
+    return;
+
+  }
+
+  coins -= price;
+
+  updateStats();
+
+  alert("🎀 You bought " + item + "!");
+
+}
+
+
+/* =========================
+   DORM
+========================= */
 
 function rest() {
-  alert("🛏️ You had a cozy rest. ✨");
+
+  reward(10);
+
+  alert("🌙 You had a cozy rest in your dorm!");
+
 }
 
+
+/* =========================
+   GARDEN
+========================= */
+
 function gardenGame(type) {
+
   if (type === "flower") {
+
+    reward(15);
+
     alert("🌸 You found a beautiful flower!");
+
   }
 
   if (type === "butterfly") {
-    alert("🦋 A butterfly fluttered by!");
+
+    reward(20);
+
+    alert("🦋 You found a butterfly!");
+
   }
 
   if (type === "magic") {
-    alert("✨ The garden feels extra magical today!");
+
+    reward(25);
+
+    alert("✨ The garden feels magical!");
+
   }
+
 }
+
+
+/* =========================
+   INITIAL SETUP
+========================= */
+
+updateStats();
+updateTimer();
 ```
