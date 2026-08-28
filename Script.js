@@ -1,11 +1,10 @@
-// 🌸 MY PERFECT DAY — Main Game Logic v2
+// 🌸 ENCHANTED PERFECT DAY — Main Game Logic
 
 let coins = Number(localStorage.getItem("coins")) || 100;
 let level = Number(localStorage.getItem("level")) || 1;
 let crowns = Number(localStorage.getItem("crowns")) || 0;
 
-let collection =
-    JSON.parse(localStorage.getItem("collection")) || [];
+let collection = JSON.parse(localStorage.getItem("collection")) || [];
 
 function saveGame() {
     localStorage.setItem("coins", coins);
@@ -23,7 +22,7 @@ function updateStats() {
 }
 
 function show(section) {
-    document.querySelectorAll(".panel").forEach(panel => {
+    document.querySelectorAll(".panel").forEach(function(panel) {
         panel.classList.add("hidden");
     });
 
@@ -67,15 +66,17 @@ function buy(item, price) {
     collection.push(item);
 
     updateCollection();
+    updateStats();
 
     alert("✨ You bought " + item + "!");
-    updateStats();
 }
 
 function updateCollection() {
     const closet = document.getElementById("closet");
 
-    if (!closet) return;
+    if (!closet) {
+        return;
+    }
 
     if (collection.length === 0) {
         closet.textContent = "Your collection is empty.";
@@ -119,7 +120,8 @@ function play(type) {
         game.innerHTML = `
             <div class="mini-game">
                 <h3>🧠 Memory Garden</h3>
-                <p>Remember this sequence:</p>
+                <p>Remember the sequence:</p>
+
                 <h2>🌸 🦋 ⭐ 🌙</h2>
 
                 <button onclick="memoryCorrect()">🌸 🦋 ⭐ 🌙</button>
@@ -168,7 +170,8 @@ function generateArt() {
     const result = document.getElementById("artResult");
 
     if (!prompt) {
-        result.innerHTML = "<p>🌸 Tell me what you want to create first!</p>";
+        result.innerHTML =
+            "<p>🌸 Tell me what you want to create first!</p>";
         return;
     }
 
@@ -191,8 +194,7 @@ function newDay() {
     alert("🌅 A brand new perfect day begins!");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function() {
     updateStats();
     updateCollection();
 });
-alert("✨My Perfect Day is working!");
