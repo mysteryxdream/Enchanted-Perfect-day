@@ -1,6 +1,4 @@
 ```javascript
-alert("SCRIPT WORKING!");
-
 let coins = Number(localStorage.getItem("coins")) || 100;
 let level = Number(localStorage.getItem("level")) || 1;
 let crowns = Number(localStorage.getItem("crowns")) || 0;
@@ -14,9 +12,13 @@ let playerX = 50;
 let playerY = 50;
 
 function updateStats() {
-  document.getElementById("coins").textContent = coins;
-  document.getElementById("level").textContent = level;
-  document.getElementById("crowns").textContent = crowns;
+  const coinsEl = document.getElementById("coins");
+  const levelEl = document.getElementById("level");
+  const crownsEl = document.getElementById("crowns");
+
+  if (coinsEl) coinsEl.textContent = coins;
+  if (levelEl) levelEl.textContent = level;
+  if (crownsEl) crownsEl.textContent = crowns;
 }
 
 function saveGame() {
@@ -26,10 +28,19 @@ function saveGame() {
 }
 
 function startGame() {
-  document.getElementById("home").classList.add("hidden");
-  document.getElementById("ending").classList.add("hidden");
-  document.getElementById("place").classList.add("hidden");
-  document.getElementById("world").classList.remove("hidden");
+  const home = document.getElementById("home");
+  const world = document.getElementById("world");
+  const place = document.getElementById("place");
+  const ending = document.getElementById("ending");
+
+  if (!home || !world) return;
+
+  home.classList.add("hidden");
+
+  if (place) place.classList.add("hidden");
+  if (ending) ending.classList.add("hidden");
+
+  world.classList.remove("hidden");
 
   timeLeft = 1440;
   activities = 0;
@@ -59,10 +70,14 @@ function updateTimer() {
 }
 
 function updateTimerDisplay() {
-  let hours = Math.floor(timeLeft / 60);
-  let minutes = timeLeft % 60;
+  const timerEl = document.getElementById("timer");
 
-  document.getElementById("timer").textContent =
+  if (!timerEl) return;
+
+  const hours = Math.floor(timeLeft / 60);
+  const minutes = timeLeft % 60;
+
+  timerEl.textContent =
     String(hours).padStart(2, "0") +
     ":" +
     String(minutes).padStart(2, "0");
@@ -73,7 +88,7 @@ function endDay() {
   timer = null;
   dayStarted = false;
 
-  let score = Math.min(100, 40 + activities * 10);
+  const score = Math.min(100, 40 + activities * 10);
 
   if (score >= 80) {
     crowns++;
@@ -101,7 +116,7 @@ function endDay() {
 function move(direction) {
   if (!dayStarted) return;
 
-  let step = 4;
+  const step = 4;
 
   if (direction === "up") playerY -= step;
   if (direction === "down") playerY += step;
@@ -115,7 +130,7 @@ function move(direction) {
 }
 
 function updatePlayer() {
-  let player = document.getElementById("player");
+  const player = document.getElementById("player");
 
   if (!player) return;
 
@@ -124,12 +139,19 @@ function updatePlayer() {
 }
 
 document.addEventListener("keydown", function(event) {
-  let key = event.key.toLowerCase();
+  if (
+    event.key === "ArrowUp" ||
+    event.key === "ArrowDown" ||
+    event.key === "ArrowLeft" ||
+    event.key === "ArrowRight"
+  ) {
+    event.preventDefault();
+  }
 
-  if (key === "arrowup" || key === "w") move("up");
-  if (key === "arrowdown" || key === "s") move("down");
-  if (key === "arrowleft" || key === "a") move("left");
-  if (key === "arrowright" || key === "d") move("right");
+  if (event.key === "ArrowUp") move("up");
+  if (event.key === "ArrowDown") move("down");
+  if (event.key === "ArrowLeft") move("left");
+  if (event.key === "ArrowRight") move("right");
 });
 
 function openPlace(place) {
@@ -138,13 +160,13 @@ function openPlace(place) {
   document.getElementById("world").classList.add("hidden");
   document.getElementById("place").classList.remove("hidden");
 
-  let content = document.getElementById("placeContent");
+  const content = document.getElementById("placeContent");
 
   if (place === "academy") {
     content.innerHTML = `
       <div class="place-icon">🏫</div>
       <h2>Enchanted Academy</h2>
-      <p>Choose a magical challenge!</p>
+      <p>Choose your magical challenge!</p>
 
       <div class="game-card">
         <h3>🗝️ Lost Keys</h3>
@@ -159,8 +181,8 @@ function openPlace(place) {
       </div>
 
       <div class="game-card">
-        <h3>🧠 Memory Garden</h3>
-        <p>Test your memory!</p>
+        <h3>🌷 Memory Garden</h3>
+        <p>Test your magical memory!</p>
         <button onclick="memoryGarden()">Play</button>
       </div>
     `;
@@ -180,10 +202,13 @@ function openPlace(place) {
     content.innerHTML = `
       <div class="place-icon">🎨</div>
       <h2>Art Studio</h2>
-      <p>Create your dream artwork!</p>
+      <p>Create something for your Perfect Day!</p>
+
       <input id="artPrompt" placeholder="A pink fairy cottage...">
       <br>
-      <button onclick="createArt()">✨ Create</button>
+
+      <button onclick="createArt()">✨ Create Art</button>
+
       <div id="miniGame"></div>
     `;
   }
@@ -225,7 +250,8 @@ function openPlace(place) {
   if (place === "garden") {
     content.innerHTML = `
       <div class="place-icon">🌷</div>
-      <h2>Enchanted Garden</h2>
+      <h2>Memory Garden</h2>
+      <p>A peaceful place for magical memories. ✨</p>
 
       <div class="game-card">
         🌸 Collect flowers
@@ -240,9 +266,9 @@ function openPlace(place) {
       </div>
 
       <div class="game-card">
-        🪙 Collect coins
+        🪙 Find a lucky coin
         <br>
-        <button onclick="gardenActivity('coin')">Collect</button>
+        <button onclick="gardenActivity('coin')">Find</button>
       </div>
     `;
   }
@@ -272,7 +298,7 @@ function completeActivity(amount) {
 }
 
 function lostKeys() {
-  let answer = prompt(
+  const answer = prompt(
     "🗝️ Which key is magical?\n\n1. 🔑\n2. 🗝️\n3. 🔐"
   );
 
@@ -285,7 +311,7 @@ function lostKeys() {
 }
 
 function potionLab() {
-  let answer = prompt(
+  const answer = prompt(
     "🧪 Which ingredient makes the potion glow?\n\n1. 🌸 Rose Petal\n2. 🪨 Stone\n3. 🍂 Leaf"
   );
 
@@ -300,13 +326,13 @@ function potionLab() {
 function memoryGarden() {
   alert("Remember:\n\n🌸 🦋 ⭐");
 
-  let answer = prompt(
+  const answer = prompt(
     "Type: flower, butterfly, star"
   );
 
   if (
     answer &&
-    answer.toLowerCase().replaceAll(" ", "") ===
+    answer.toLowerCase().replace(/\s/g, "") ===
     "flower,butterfly,star"
   ) {
     reward(40);
@@ -317,7 +343,7 @@ function memoryGarden() {
 }
 
 function cafeGame() {
-  let answer = prompt(
+  const answer = prompt(
     "☕ Make a Fairy Latte!\n\n1. Milk → Stardust → Rose Syrup\n2. Stone → Milk → Leaf\n3. Leaf → Stone → Stardust"
   );
 
@@ -330,10 +356,10 @@ function cafeGame() {
 }
 
 function createArt() {
-  let input = document.getElementById("artPrompt");
-  let result = document.getElementById("miniGame");
+  const input = document.getElementById("artPrompt");
+  const result = document.getElementById("miniGame");
 
-  let text = input.value.trim();
+  const text = input.value.trim();
 
   if (!text) {
     result.innerHTML =
@@ -353,7 +379,7 @@ function createArt() {
 }
 
 function escapeHTML(text) {
-  let div = document.createElement("div");
+  const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
 }
@@ -365,6 +391,11 @@ function buyItem(item, price) {
   }
 
   coins -= price;
+
+  if (item === "Crown") {
+    crowns++;
+  }
+
   saveGame();
   updateStats();
 
@@ -384,7 +415,7 @@ function gardenActivity(type) {
 
   if (type === "coin") {
     reward(25);
-    alert("🪙 Coins collected!");
+    alert("🪙 Lucky coin found!");
   }
 }
 
