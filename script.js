@@ -1,4 +1,4 @@
-// 🌸 ENCHANTED PERFECT DAY — Main Game Logic
+// 🌸 ENCHANTED PERFECT DAY — Game Logic
 
 let coins = Number(localStorage.getItem("coins")) || 100;
 let level = Number(localStorage.getItem("level")) || 1;
@@ -21,15 +21,29 @@ function updateStats() {
     saveGame();
 }
 
-function show(section) {
-    document.querySelectorAll(".panel").forEach(function(panel) {
-        panel.classList.add("hidden");
+function hideAllScreens() {
+    document.querySelectorAll(".screen").forEach(function(screen) {
+        screen.classList.add("hidden");
     });
+}
 
-    const selected = document.getElementById(section);
+function enterAcademy() {
+    hideAllScreens();
+    document.getElementById("academy").classList.remove("hidden");
+}
 
-    if (selected) {
-        selected.classList.remove("hidden");
+function backToAcademy() {
+    hideAllScreens();
+    document.getElementById("academy").classList.remove("hidden");
+}
+
+function openLocation(location) {
+    hideAllScreens();
+
+    const screen = document.getElementById(location);
+
+    if (screen) {
+        screen.classList.remove("hidden");
     }
 }
 
@@ -47,7 +61,11 @@ function checkLevel() {
 
     if (newLevel > level) {
         level = newLevel;
-        alert("🌟 LEVEL UP!\n\nYou are now Level " + level + "!");
+
+        alert(
+            "🌟 LEVEL UP!\n\n" +
+            "You are now Level " + level + "!"
+        );
     }
 }
 
@@ -58,7 +76,12 @@ function buy(item, price) {
     }
 
     if (coins < price) {
-        alert("💗 You need " + (price - coins) + " more coins!");
+        alert(
+            "💗 You need " +
+            (price - coins) +
+            " more coins!"
+        );
+
         return;
     }
 
@@ -90,15 +113,27 @@ function updateCollection() {
 function play(type) {
     const game = document.getElementById("game");
 
+    if (!game) {
+        return;
+    }
+
     if (type === "keys") {
         game.innerHTML = `
             <div class="mini-game">
-                <h3>🗝️ Lost Keys</h3>
+                <h2>🗝️ Lost Keys</h2>
                 <p>Which key opens the magical academy?</p>
 
-                <button onclick="winGame(30)">🔑 Pink Key</button>
-                <button onclick="wrongKey()">🔑 Blue Key</button>
-                <button onclick="wrongKey()">🔑 Golden Key</button>
+                <button onclick="winGame(30)">
+                    🔑 Pink Key
+                </button>
+
+                <button onclick="wrongAnswer()">
+                    🔑 Blue Key
+                </button>
+
+                <button onclick="wrongAnswer()">
+                    🔑 Golden Key
+                </button>
             </div>
         `;
     }
@@ -106,12 +141,20 @@ function play(type) {
     if (type === "potion") {
         game.innerHTML = `
             <div class="mini-game">
-                <h3>🧪 Potion Lab</h3>
+                <h2>🧪 Potion Lab</h2>
                 <p>Which ingredient makes a healing potion?</p>
 
-                <button onclick="wrongPotion()">🌙 Moon Dust</button>
-                <button onclick="winGame(40)">🌿 Healing Herb</button>
-                <button onclick="wrongPotion()">✨ Stardust</button>
+                <button onclick="wrongAnswer()">
+                    🌙 Moon Dust
+                </button>
+
+                <button onclick="winGame(40)">
+                    🌿 Healing Herb
+                </button>
+
+                <button onclick="wrongAnswer()">
+                    ✨ Stardust
+                </button>
             </div>
         `;
     }
@@ -119,14 +162,22 @@ function play(type) {
     if (type === "memory") {
         game.innerHTML = `
             <div class="mini-game">
-                <h3>🧠 Memory Garden</h3>
-                <p>Remember the sequence:</p>
+                <h2>🧠 Memory Garden</h2>
+                <p>Remember this magical sequence:</p>
 
-                <h2>🌸 🦋 ⭐ 🌙</h2>
+                <h1>🌸 🦋 ⭐ 🌙</h1>
 
-                <button onclick="memoryCorrect()">🌸 🦋 ⭐ 🌙</button>
-                <button onclick="memoryWrong()">🌙 ⭐ 🦋 🌸</button>
-                <button onclick="memoryWrong()">⭐ 🌸 🌙 🦋</button>
+                <button onclick="winGame(50)">
+                    🌸 🦋 ⭐ 🌙
+                </button>
+
+                <button onclick="wrongAnswer()">
+                    🌙 ⭐ 🦋 🌸
+                </button>
+
+                <button onclick="wrongAnswer()">
+                    ⭐ 🌸 🌙 🦋
+                </button>
             </div>
         `;
     }
@@ -135,51 +186,59 @@ function play(type) {
 function winGame(reward) {
     coins += reward;
 
+    crowns += 1;
+
     alert(
-        "🎉 You completed the challenge!\n\n" +
-        "🪙 +" + reward + " coins!"
+        "🎉 Challenge Complete!\n\n" +
+        "🪙 +" + reward + " coins!\n" +
+        "👑 +1 crown!"
     );
 
     checkLevel();
     updateStats();
 
     document.getElementById("game").innerHTML = `
-        <h3>✨ Challenge Complete!</h3>
-        <p>Great job! Choose another activity. 🌸</p>
+        <div class="mini-game">
+            <h2>✨ You did it!</h2>
+            <p>Challenge complete! 🌸</p>
+
+            <button onclick="openLocation('activities')">
+                🎮 Play Again
+            </button>
+
+            <button onclick="backToAcademy()">
+                🏰 Academy Map
+            </button>
+        </div>
     `;
 }
 
-function wrongKey() {
-    alert("❌ Not this key! Try again.");
-}
-
-function wrongPotion() {
-    alert("🧪 That's not the right ingredient!");
-}
-
-function memoryCorrect() {
-    winGame(50);
-}
-
-function memoryWrong() {
-    alert("🧠 Not quite! Try again!");
+function wrongAnswer() {
+    alert("❌ Not quite! Try again! ✨");
 }
 
 function generateArt() {
-    const prompt = document.getElementById("prompt").value.trim();
+    const input = document.getElementById("prompt");
     const result = document.getElementById("artResult");
+
+    if (!input || !result) {
+        return;
+    }
+
+    const prompt = input.value.trim();
 
     if (!prompt) {
         result.innerHTML =
-            "<p>🌸 Tell me what you want to create first!</p>";
+            "<p>🌸 Describe your magical artwork first!</p>";
+
         return;
     }
 
     result.innerHTML = `
-        <div class="art-card">
+        <div class="mini-game">
             <h3>🎨 Your Dream Artwork</h3>
-            <p>✨ "${prompt}"</p>
-            <p>🤖 AI artwork generation will be connected here!</p>
+            <p>✨ ${prompt}</p>
+            <p>🌟 Your magical artwork idea has been created!</p>
         </div>
     `;
 
@@ -187,11 +246,16 @@ function generateArt() {
 }
 
 function newDay() {
-    show("activities");
+    coins += 10;
 
-    document.getElementById("game").innerHTML = "";
+    updateStats();
 
-    alert("🌅 A brand new perfect day begins!");
+    alert(
+        "🌅 A brand new perfect day begins!\n\n" +
+        "🪙 +10 welcome coins!"
+    );
+
+    enterAcademy();
 }
 
 document.addEventListener("DOMContentLoaded", function() {
