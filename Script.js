@@ -1,4 +1,4 @@
-// 🌸 MY PERFECT DAY — Main Game Logic
+// 🌸 MY PERFECT DAY — Main Game Logic v2
 
 let coins = Number(localStorage.getItem("coins")) || 100;
 let level = Number(localStorage.getItem("level")) || 1;
